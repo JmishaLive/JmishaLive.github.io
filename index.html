@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сайт Стримера</title>
+    <style>
+	/* Базовые стили и цвета */
+        :root {
+            --bg-color: #0e0e10;
+            --text-color: #efeff1;
+            /* Сплошной цвет для текста и тонких рамок */
+            --accent-solid: #0096b0; 
+            /* Градиент, взятый с вашего логотипа, для кнопок и элементов */
+            --accent-gradient: linear-gradient(135deg, #0096b0 0%, #342056 100%); 
+            --card-bg: #18181b;
+        }
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0; padding: 0;
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        section { padding: 10px 10px; max-width: 1100px; margin: 0 auto; }
+        h2 { text-align: center; margin-bottom: 40px; font-size: 2.2rem; font-weight: 700;}
+
+	/* --- Кастомная полоса прокрутки --- */
+        
+        /* Ширина всей полосы прокрутки */
+        ::-webkit-scrollbar {
+            width: 10px; 
+        }
+
+        /* Фон (дорожка), по которому движется ползунок */
+        ::-webkit-scrollbar-track {
+            background: #121212; /* Темный фон под цвет вашего сайта */
+        }
+
+        /* Сам ползунок (скролл) */
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--accent-solid), var(--accent-purple)); /* Фирменный вертикальный градиент */
+            border-radius: 10px; /* Скругленные края, как на вашем референсе */
+            border: 2px solid #121212; /* Небольшая рамка в цвет фона, чтобы ползунок казался тоньше и изящнее */
+        }
+
+        /* Ползунок при наведении на него курсора */
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #00b3d4, var(--accent-purple)); /* Делаем верхнюю часть чуть ярче при наведении */
+        }
+
+        /* Для Firefox (он пока не поддерживает градиенты в скроллбаре, поэтому задаем сплошной цвет) */
+        html {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-solid) #121212;
+        }
+
+	/* --- 1. Шапка и соцсети --- */
+        header {
+            background: rgba(14, 14, 16, 0.85); 
+            backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 100;
+            border-bottom: 1px solid #333;
+        }
+        /* Новый контейнер для выравнивания по ширине сайта */
+        .header-inner {
+            display: flex; justify-content: space-between; align-items: center;
+            max-width: 1100px; margin: 0 auto; padding: 15px 20px; width: 100%;
+            box-sizing: border-box;
+        }
+	/* Обновленные стили логотипа, никнейма и цитаты */
+        .logo-container { 
+            display: flex; align-items: center; gap: 18px; 
+        }
+        .logo { 
+            display: block; /* Обязательно для тега a */
+            width: 70px; height: 70px; flex-shrink: 0;
+            border-radius: 50%; background-size: cover; background-position: center;
+            border: 2px solid var(--accent-solid); 
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+        }
+        .logo:hover {
+            transform: scale(1.05); /* Увеличение при наведении только на логотип */
+            box-shadow: 0 0 15px rgba(0, 150, 176, 0.4); /* Легкое бирюзовое свечение */
+        }
+        
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start; /* Пристыковка текста к левому краю */
+        }
+        .brand-text .nickname {
+            font-size: 2.2rem; /* Крупный размер */
+            font-weight: 900; /* Максимально жирный шрифт */
+            color: var(--accent-solid); /* Основной бирюзовый цвет */
+            line-height: 1;
+            text-transform: uppercase; /* Делает все буквы заглавными, как на примере */
+            letter-spacing: 1px;
+        }
+        .brand-text .quote {
+            font-size: 0.85rem; /* Мелкий шрифт */
+            color: #9393a5; /* Приглушенный сероватый оттенок для контраста */
+            margin-top: 6px;
+            font-weight: 500;
+            text-transform: uppercase; /* Тоже заглавными, как на картинке */
+            letter-spacing: 0.5px;
+        }
+        
+        .socials { display: flex; gap: 20px; }
+	.social-btn {
+            position: relative; width: 40px; height: 40px; border-radius: 10px;
+            background-size: 65%; 
+            background-repeat: no-repeat;
+            background-position: center; cursor: pointer; 
+            /* Меняем белый цвет на цвет карточек расписания */
+            background-color: var(--card-bg); 
+            border: 2px solid #333; 
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* Эффект при наведении (как у карточки дня) */
+        .social-btn:hover { 
+            transform: translateY(-6px) scale(1.1); 
+            border-color: var(--accent-solid);
+            box-shadow: 0 0 15px rgba(0, 150, 176, 0.4); 
+        }
+        
+        .social-btn::after {
+            content: attr(data-tooltip); position: absolute; bottom: -35px; left: 50%;
+            transform: translateX(-50%); background: #fff; color: #000; padding: 4px 10px;
+            border-radius: 6px; font-size: 12px; font-weight: bold; opacity: 0; 
+            transition: opacity 0.3s, bottom 0.3s; pointer-events: none; white-space: nowrap;
+        }
+        .social-btn:hover::after { opacity: 1; bottom: -40px; }
+
+        /* --- 2. Карусель VODов и поиск --- */
+        .search-container { text-align: center; margin-bottom: 30px; }
+        #gameSearch { 
+            padding: 12px 25px; border-radius: 30px; border: 2px solid #333; 
+            width: 100%; max-width: 400px; background: var(--bg-color); color: white;
+            font-size: 1rem; transition: border-color 0.3s; outline: none;
+        }
+        #gameSearch:focus { border-color: var(--accent-solid); } /* Сплошной цвет для рамки */
+        
+	.carousel {
+            display: flex; overflow-x: auto; gap: 25px; padding: 20px 10px;
+            scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: var(--accent-solid) var(--bg-color);
+            cursor: grab; /* Курсор "хватания" по умолчанию */
+        }
+        .carousel::-webkit-scrollbar { height: 8px; }
+        .carousel::-webkit-scrollbar-thumb { background: var(--accent-gradient); border-radius: 4px; } /* Градиент для скролла */
+        
+        .game-card img { width: 100%; height: 213px; object-fit: cover; display: block; }
+        .game-title { text-align: center; padding: 12px 5px; font-size: 14px; font-weight: bold; }
+        
+	/* --- Контейнер записей (теперь всегда видим и более узкий) --- */
+        .vod-links { 
+            display: flex; 
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center; 
+            margin-top: 30px; 
+            padding: 20px 30px; /* Существенно уменьшили верхний и нижний отступы (было 30px) */
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            min-height: 110px; /* Фиксируем высоту, чтобы блок не дергался при смене контента */
+            box-sizing: border-box;
+        }
+        
+        #selectedGameTitle {
+            margin: 0 0 15px 0; /* Уменьшили отступ под заголовком */
+            display: none; /* Скрываем заголовок, пока игра не выбрана */
+        }
+        
+        #selectedGameTitle.visible {
+            display: block; /* Показываем, когда игра выбрана */
+        }
+
+        .vod-btn-container { 
+            display: flex; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            gap: 25px; 
+            width: 100%;
+        }
+
+        /* Текст-пояснение до выбора игры */
+        .placeholder-text {
+            color: #9393a5;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        /* --- Обводка выбранной карточки в карусели --- */
+	.game-card {
+            flex: 0 0 auto; width: 160px; scroll-snap-align: start; cursor: pointer;
+            border-radius: 12px; overflow: hidden; background: var(--card-bg);
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            user-select: none;
+            border: 2px solid transparent; 
+            box-sizing: border-box; /* Возвращаем карточкам строгую ширину 160px вместе с рамкой */
+        }
+        
+        .game-card:hover { 
+            transform: translateY(-10px); 
+            box-shadow: 0 15px 25px rgba(0, 150, 176, 0.2); 
+        }
+
+        /* Класс, который будет добавляться кликнутой карточке */
+        .game-card.selected {
+            border-color: var(--accent-solid); /* Бирюзовая обводка */
+            box-shadow: 0 0 20px rgba(0, 150, 176, 0.4); /* Подсветка */
+            transform: translateY(-10px); /* Фиксируем в приподнятом состоянии */
+        }
+
+        .action-btn { 
+            display: flex; 
+            align-items: center; /* Выравниваем иконку и текст по центру по вертикали */
+            justify-content: center; /* Выравниваем по центру по горизонтали */
+            gap: 12px; /* Расстояние между иконкой и текстом */
+            width: 220px; /* Фиксированная одинаковая ширина для всех кнопок */
+            box-sizing: border-box; /* Чтобы внутренние отступы не ломали ширину */
+            padding: 12px 20px; 
+            background: var(--accent-gradient); /* Ваш фирменный градиент */
+            color: white; 
+            text-decoration: none; 
+            border-radius: 8px; 
+            font-weight: bold;
+            transition: filter 0.3s, transform 0.2s; 
+            border: none; 
+            cursor: pointer;
+        }
+
+        .action-btn:hover { 
+            filter: brightness(1.2); 
+            transform: scale(1.05); 
+        }
+
+        /* Новый класс для иконки внутри кнопки */
+        .btn-icon {
+            width: 24px;
+            height: 24px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            flex-shrink: 0; /* Запрещаем иконке сжиматься */
+        }
+
+	/* --- 3. Расписание --- */
+        .schedule-subtitle {
+            text-align: center;
+            color: #9393a5; 
+            margin-top: -25px; /* Чуть приподняли к заголовку */
+            margin-bottom: 30px;
+            font-size: 1.15rem; /* Сделали пояснительный текст крупнее (было 0.95rem) */
+        }
+        .schedule-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; }
+        
+        .day-card { 
+            background: var(--card-bg); 
+            padding: 15px 10px; /* Существенно уменьшили высоту: верх/низ теперь 15px вместо 25px */
+            border-radius: 12px; 
+            text-align: center; transition: transform 0.3s; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .day-card:hover { transform: translateY(-8px); }
+        .day-card.today { 
+            border: 2px solid var(--accent-solid); 
+            box-shadow: 0 0 20px rgba(0, 150, 176, 0.3); 
+            background: linear-gradient(180deg, rgba(0, 150, 176, 0.1) 0%, var(--card-bg) 100%);
+        }
+        
+        /* Блок для иконки над днем недели */
+        .day-icon {
+            width: 45px; 
+            height: 45px; 
+            margin-bottom: 6px; /* Уменьшили пустое место под иконкой (было 12px) */
+            background-size: contain; 
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .day-name { 
+            font-weight: 900; /* Сделали шрифт максимально жирным (было просто bold) */
+            margin-bottom: 2px; /* Убрали лишнюю пустоту перед временем (было 10px) */
+            color: var(--accent-solid); 
+            font-size: 1.45rem; /* Ощутимо увеличили размер дней недели (было 1.1rem) */
+            letter-spacing: 0.5px; /* Чуть раздвинули буквы для читаемости жирного шрифта */
+        }
+        
+        .time {
+            font-weight: 800; /* Сделали шрифт максимально жирным (было просто bold) */
+            font-size: 0.95rem; /* Чуть аккуратнее подогнали размер времени */
+            color: #d1d1d6; /* Сделали цвет времени чуть мягче, чтобы день недели выделялся еще сильнее */
+        }
+
+	/* --- 4. Поддержка --- */
+        .support-grid {
+            display: grid;
+            /* Делаем две равные колонки, ограничиваем максимальную ширину блока, чтобы карточки не растягивались на весь экран */
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+            max-width: 600px; 
+            margin: 0 auto;
+        }
+
+	/* Основная карточка поддержки */
+        .support-card {
+            background: var(--card-bg);
+            padding: 30px 20px;
+            border-radius: 12px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            /* Добавляем прозрачную рамку, чтобы карточка не "прыгала" при появлении обводки */
+            border: 2px solid transparent; 
+            transition: all 0.3s ease;
+        }
+
+        /* Эффект при наведении на карточку (обводка + свечение) */
+        .support-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-solid); /* Фирменная рамка */
+            box-shadow: 0 0 20px rgba(0, 150, 176, 0.3); /* Фирменное свечение, как у расписания */
+        }
+
+        .support-icon {
+            width: 40px;
+            height: 40px;
+            margin-bottom: 15px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .support-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 25px;
+        }
+
+	/* Стили для кнопки-ссылки (DonationAlerts) */
+        .support-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 45px;
+            border-radius: 8px;
+            /* Задаем жесткий градиент от бирюзового к фиолетовому на случай, если переменные не сработают */
+            background: linear-gradient(135deg, #0096b0 0%, #6a00ff 100%);
+            color: #ffffff; /* Жестко задаем белый цвет текста */
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.05rem;
+            transition: opacity 0.3s, transform 0.2s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Легкая тень для самой кнопки */
+        }
+
+        /* Эффект при наведении на саму кнопку */
+        .support-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.02); /* Кнопка чуть-чуть увеличивается, приглашая к клику */
+            color: #ffffff;
+        }
+
+        /* Стили для поля с номером карты */
+        .copy-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 45px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05); /* Полупрозрачный фон */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-color);
+            font-family: monospace; /* Шрифт как у кода для цифр */
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            user-select: none; /* Запрещаем обычное выделение текста мышкой */
+        }
+
+        .copy-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-solid); /* Подсветка фирменным цветом */
+        }
+        
+        /* Класс, который будет добавляться через JS при успешном копировании */
+        .copy-card.copied {
+            background: var(--accent-solid);
+            color: #121212;
+            border-color: var(--accent-solid);
+            font-weight: bold;
+        }
+
+/* --- 5. Контакты --- */
+        .contacts-grid {
+            display: grid;
+            /* Карточки будут автоматически подстраиваться. Минимальная ширина 280px */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+	.contact-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center; 
+            border: 2px solid transparent; 
+            transition: all 0.3s ease;
+            text-decoration: none; /* Убираем стандартное подчеркивание ссылок */
+            color: inherit; /* Чтобы текст не стал синим, как у обычных ссылок */
+            cursor: pointer; /* Показываем, что вся карточка кликабельна */
+        }
+
+        /* Эффект при наведении (фирменная подсветка) */
+        .contact-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-solid); 
+            box-shadow: 0 0 20px rgba(0, 150, 176, 0.3); 
+        }
+
+        /* Квадрат вокруг иконки, как на макете */
+        .contact-icon {
+            width: 55px;
+            height: 55px;
+            flex-shrink: 0; /* Чтобы иконка не сжималась */
+            margin-right: 18px;
+            background-color: rgba(255, 255, 255, 0.03); /* Едва заметный фон */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            
+            /* Настройки самой картинки внутри квадрата */
+            background-size: 80%; /* Размер самой SVG внутри квадрата */
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        /* Контейнер для текста (описание + ссылка) */
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        /* Первая строка: описание */
+        .contact-desc {
+            font-size: 0.75rem;
+            color: #9393a5; /* Серый цвет */
+            text-transform: uppercase; /* Все буквы заглавные */
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+	/* Вторая строка (теперь это просто цветной текст внутри карточки-ссылки) */
+        .contact-link {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--accent-solid); /* Фирменный бирюзовый цвет */
+        }
+        
+	/* --- 6. Футер --- */
+        footer {
+            text-align: center;
+            padding: 40px 20px 30px; /* Отступы сверху, по бокам и снизу */
+            margin-top: 40px;
+            border-top: 1px solid #333; /* Тонкая серая линия, как в шапке */
+            color: #9393a5; /* Приглушенный цвет текста */
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+	/* --- Кнопка "Наверх" с прогрессом --- */
+        #scrollTop {
+            position: fixed; 
+            bottom: 40px; 
+            right: 40px; 
+            width: 55px; 
+            height: 55px;
+            /* Усиленный градиент, чтобы граница заливки была идеально ровной */
+            background: linear-gradient(to top, var(--accent-solid) 0%, var(--accent-solid) var(--scroll-progress, 0%), var(--card-bg) var(--scroll-progress, 0%), var(--card-bg) 100%);
+            
+            /* Ключевое исправление: запрещаем фону залезать под рамку */
+            background-clip: padding-box; 
+            
+            color: white; 
+            /* Непрозрачный серый цвет (как у ваших кнопок соцсетей) */
+            border: 2px solid #333; 
+            border-radius: 50%;
+            cursor: pointer; 
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden; 
+            
+            opacity: 0; 
+            visibility: hidden; 
+            transform: translateY(20px); 
+            transition: opacity 0.5s ease, transform 0.5s ease, visibility 0.5s ease, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #scrollTop.visible { 
+            opacity: 1; 
+            visibility: visible;
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5); /* Тень появляется вместе с кнопкой */
+        }
+
+        #scrollTop:hover { 
+            border-color: var(--accent-solid); /* Фирменная обводка при наведении */
+            box-shadow: 0 0 20px rgba(0, 150, 176, 0.5); /* Свечение */
+        }
+
+	/* Стили для самой SVG стрелочки (теперь крупнее и строго по центру) */
+        #scrollTop svg {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            z-index: 2; 
+        }
+    </style>
+</head>
+<body>
+	<!-- ВЕРХНЯЯ ЧАСТЬ (Шапка) -->
+    <header>
+        <div class="header-inner">
+            <div class="logo-container">
+                <!-- Теперь ссылкой является только сам кружок логотипа -->
+                <a href="#" class="logo" style="background-image: url('images/logo.png');"></a>
+                
+                <!-- Блок с текстом (никнейм и цитата) -->
+                <div class="brand-text">
+                    <span class="nickname">JMISHA</span>
+                    <span class="quote">Лучшие игры — те, которые заставляют вас что-то чувствовать.</span>
+                </div>
+            </div>
+            
+            <div class="socials">
+                <a href="https://live.vkvideo.ru/jmisha" target="_blank" class="social-btn" 
+                   style="background-image: url('images/VK_Video.svg');" 
+                   data-tooltip="VK Video Live"></a>
+                   
+                <a href="https://www.twitch.tv/jmishalive" target="_blank" class="social-btn" 
+                   style="background-image: url('images/Twitch_icon_2012.svg');" 
+                   data-tooltip="Twitch"></a>
+                   
+                <a href="https://rutube.ru/channel/38941286/" target="_blank" class="social-btn" 
+                   style="background-image: url('images/Rutube_icon.svg');" 
+                   data-tooltip="Rutube"></a>
+
+                <a href="https://vk.ru/jmisha_live" target="_blank" class="social-btn" 
+                   style="background-image: url('images/VK.com-logo.svg');" 
+                   data-tooltip="VKontakte"></a>
+                   
+                <a href="https://t.me/jmishalive" target="_blank" class="social-btn" 
+                   style="background-image: url('images/Telegram_logo.svg');" 
+                   data-tooltip="Telegram"></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- КАРУСЕЛЬ И ЗАПИСИ СТРИМОВ -->
+    <section id="vods">
+        <h2>Записи стримов</h2>
+        <div class="search-container">
+            <input type="search" id="gameSearch" placeholder="Поиск по названию игры...">
+        </div>
+        
+        <!-- КАРТОЧКИ УДАЛЕНЫ, ТЕПЕРЬ БЛОК ПУСТОЙ -->
+        <div class="carousel" id="gameCarousel"></div>
+
+	<div id="vodContainer" class="vod-links">
+            <h3 id="selectedGameTitle"></h3>
+            <div id="vodButtons" class="vod-btn-container">
+                <p class="placeholder-text">Выберите игру из списка, чтобы посмотреть доступные записи.</p>
+            </div>
+        </div>
+    </section>
+
+	<!-- РАСПИСАНИЕ -->
+    <section id="schedule">
+        <h2>Расписание</h2>
+        <!-- Пояснительный текст -->
+        <p class="schedule-subtitle">Стримы проходят в свободное время, если нет более важных задач.</p>
+        <div class="schedule-grid" id="scheduleGrid"></div>
+    </section>
+
+	<!-- ПОДДЕРЖКА -->
+    <section id="donate">
+        <h2>Поддержка стримера</h2>
+        <p class="schedule-subtitle">Огромное спасибо за поддержку! Она идет на улучшение качества контента.</p>
+        
+        <div class="support-grid">
+            <!-- Карточка 1: Кнопка-ссылка -->
+            <div class="support-card">
+                <!-- Путь к иконке (закиньте нужный svg в папку images) -->
+                <div class="support-icon" style="background-image: url('images/DA_Alert_Color.svg');"></div>
+                <div class="support-title">DonationAlerts</div>
+                <!-- Замените # на вашу ссылку -->
+                <a href="https://www.donationalerts.com/r/jmisha" target="_blank" class="support-btn">Поддержать</a>
+            </div>
+
+            <!-- Карточка 2: Копирование карты -->
+            <div class="support-card">
+                <div class="support-icon" style="background-image: url('images/credit_card.svg');"></div>
+                <div class="support-title">Перевод на карту</div>
+                <!-- В первые кавычки функции copyCardNumber впишите реальный номер карты без пробелов, а в тег <div> — как он будет отображаться -->
+                <div class="copy-card" onclick="copyCardNumber('4817760269314393', this)">
+                    4817 7602 6931 4393
+                </div>
+            </div>
+        </div>
+    </section>
+
+	<!-- КОНТАКТЫ -->
+    <section id="contacts">
+        <h2>Контакты</h2>
+        
+	<div class="contacts-grid">
+            <!-- Карточка 1: Email (теперь вся карточка это ссылка mailto) -->
+            <a href="mailto:jmisha@mail.ru" class="contact-card">
+                <div class="contact-icon" style="background-image: url('images/email2.svg');"></div>
+                <div class="contact-info">
+                    <div class="contact-desc">Email для сотрудничества</div>
+                    <div class="contact-link">jmisha@mail.ru</div>
+                </div>
+            </a>
+
+            <!-- Карточка 2: VK (вся карточка открывает новую вкладку) -->
+            <a href="https://vk.ru/jmisha" target="_blank" class="contact-card">
+                <div class="contact-icon" style="background-image: url('images/VK.com-logo.svg');"></div>
+                <div class="contact-info">
+                    <div class="contact-desc">Личная страница VK</div>
+                    <div class="contact-link">vk.ru/jmisha</div>
+                </div>
+            </a>
+
+            <!-- Карточка 3: Telegram -->
+            <a href="https://t.me/jmisha" target="_blank" class="contact-card">
+                <div class="contact-icon" style="background-image: url('images/Telegram_logo.svg');"></div>
+                <div class="contact-info">
+                    <div class="contact-desc">Telegram</div>
+                    <div class="contact-link">@jmisha</div>
+                </div>
+            </a>
+       </div>
+    </section>
+
+	<!-- ФУТЕР -->
+    <footer>
+        <div class="footer-content">
+            &copy; <span id="currentYear"></span> JMISHA. Все права защищены.
+        </div>
+    </footer>
+
+	<!-- КНОПКА НАВЕРХ -->
+    <button id="scrollTop" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+	<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+            <!-- Координаты Y сдвинуты вверх ровно на 1.5 для идеального геометрического центра -->
+            <polyline points="7 11.5 12 6.5 17 11.5"></polyline>
+            <polyline points="7 17.5 12 12.5 17 17.5"></polyline>
+        </svg>
+    </button>
+
+	<script>
+	/* --- Настройки ссылок и путей --- */ 
+    const targetUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRNs8-xfBxY7HNCbRI7j4PT_PhnFXioenfGozKoTj241G4M92_VVKB6oidY0QAHZPeEXfuhLkhw5Mgh/pub?gid=1478759022&single=true&output=csv';
+    const googleCsvUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`;
+    
+    // Путь к локальной таблице (если Google не ответит)
+    const localCsvUrl = 'data/games_rec.csv'; 
+    
+    // Путь к картинке по умолчанию (положите её в папку images)
+    const defaultCoverImage = 'images/default_game_cover.webp'; 
+
+	/* --- Умная загрузка: Локально + Фоновое обновление --- */
+    async function initGames() {
+        const carousel = document.getElementById('gameCarousel');
+        let localData = [];
+
+        // ШАГ 1: Мгновенно грузим локальную базу (без экранов загрузки)
+        try {
+            const localResponse = await fetch(localCsvUrl);
+            if (localResponse.ok) {
+                const localText = await localResponse.text();
+                localData = parseCSV(localText);
+                if (localData.length > 0) {
+                    renderGames(localData);
+                    console.log('Локальная база отрисована моментально.');
+                }
+            }
+        } catch (errorLocal) {
+            console.warn('Локальная база недоступна, показываем индикатор загрузки...');
+            carousel.innerHTML = '<div style="width:100%; text-align:center; padding: 40px; color: var(--accent-solid); font-weight: bold; font-size: 1.2rem; letter-spacing: 1px;">ЗАГРУЗКА БАЗЫ ИГР... ⏳</div>';
+        }
+
+        // ШАГ 2: В фоне стучимся в Google Таблицу
+        try {
+            const onlineResponse = await fetch(googleCsvUrl);
+            if (onlineResponse.ok) {
+                const onlineText = await onlineResponse.text();
+                const onlineData = parseCSV(onlineText);
+                
+                // ШАГ 3: Сравниваем и обновляем
+                if (onlineData.length > localData.length) {
+                    console.log(`Найдено ${onlineData.length - localData.length} новых игр! Обновляем витрину.`);
+                    // Функция renderGames сама очистит карусель и быстро вставит новые карточки
+                    renderGames(onlineData);
+                } else {
+                    console.log('Обновлений нет, локальная база актуальна.');
+                    // Спасательный круг: если локальной базы вообще не было, но онлайн загрузился
+                    if (localData.length === 0) {
+                        renderGames(onlineData);
+                    }
+                }
+            }
+        } catch (errorGoogle) {
+            console.error('Ошибка фонового скачивания сети:', errorGoogle.message);
+            // Если интернет отвалился или прокси тупит — ничего страшного, 
+            // пользователь уже смотрит локальную базу, которую мы подгрузили в Шаге 1
+            if (localData.length === 0) {
+                carousel.innerHTML = `<p style="text-align:center; width:100%; color: #ff5555; padding: 20px;">Не удалось загрузить список игр.</p>`;
+            }
+        }
+    }
+
+    /* --- Функция разбора CSV --- */
+    function parseCSV(text) {
+        const lines = text.split('\n');
+        if (lines.length < 1) return [];
+
+        const parseRow = (str) => {
+            let row = [], inQuotes = false, col = '';
+            for (let i = 0; i < str.length; i++) {
+                let char = str[i], nextChar = str[i+1];
+                if (char === '"' && inQuotes && nextChar === '"') { col += '"'; i++; continue; }
+                if (char === '"') { inQuotes = !inQuotes; continue; }
+                if (char === ',' && !inQuotes) { row.push(col.trim()); col = ''; continue; }
+                col += char;
+            }
+            row.push(col.trim());
+            return row;
+        };
+
+        let headerIdx = -1;
+        let headers = [];
+        for (let i = 0; i < lines.length; i++) {
+            const row = parseRow(lines[i]);
+            if (row.includes('Название игры')) {
+                headerIdx = i;
+                headers = row;
+                break;
+            }
+        }
+
+        if (headerIdx === -1) {
+            throw new Error('Колонка "Название игры" не найдена в документе.');
+        }
+
+        const titleIdx = headers.indexOf('Название игры');
+        const coverIdx = headers.indexOf('Обложка');
+        const vkIdx = headers.indexOf('VKplay');
+        const youtubeIdx = headers.indexOf('Youtube');
+        const rutubeIdx = headers.indexOf('Rutube');
+
+        const data = [];
+        
+        for (let i = headerIdx + 1; i < lines.length; i++) {
+            if (!lines[i] || !lines[i].trim()) continue; 
+            const row = parseRow(lines[i]);
+            
+            const title = row[titleIdx];
+            if (!title) continue; 
+
+            // Логика обложки: если колонка есть и не пустая — берем оттуда, иначе ставим картинку по умолчанию
+            const image = (coverIdx !== -1 && row[coverIdx] && row[coverIdx].trim() !== '') 
+                ? row[coverIdx] 
+                : defaultCoverImage;
+                
+            data.push({
+                title: title,
+                image: image,
+                vk: vkIdx !== -1 ? row[vkIdx] : '',
+                youtube: youtubeIdx !== -1 ? row[youtubeIdx] : '',
+                rutube: rutubeIdx !== -1 ? row[rutubeIdx] : ''
+            });
+        }
+        return data.reverse(); 
+    }
+
+	function renderGames(gamesData) {
+        const carousel = document.getElementById('gameCarousel');
+        carousel.innerHTML = ''; 
+        window.currentGamesData = gamesData;
+
+        let currentIndex = 0;
+        const chunkSize = 20; // Количество карточек за одну порцию
+
+        function renderChunk() {
+            const fragment = document.createDocumentFragment();
+            const endIndex = Math.min(currentIndex + chunkSize, gamesData.length);
+            
+            for (let i = currentIndex; i < endIndex; i++) {
+                const game = gamesData[i];
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.setAttribute('data-title', game.title);
+                
+		card.addEventListener('click', (e) => {
+                    if (window.isDraggingCarousel) {
+                        e.preventDefault();
+                        return;
+                    }
+                    
+                    // Снимаем выделение со всех карточек
+                    document.querySelectorAll('.game-card').forEach(c => c.classList.remove('selected'));
+                    // Добавляем бирюзовую рамку кликнутой карточке
+                    card.classList.add('selected');
+
+                    showVods(i);
+                });
+                
+                // Трюк с фоном и обработчиком ошибок onerror
+                card.innerHTML = `
+                    <img src="${game.image}" 
+                         alt="${game.title}" 
+                         draggable="false" 
+                         loading="lazy"
+                         style="background: url('${defaultCoverImage}') center/cover no-repeat; color: transparent;"
+                         onerror="this.onerror=null; this.src='${defaultCoverImage}';">
+                    <div class="game-title">${game.title}</div>
+                `;
+                fragment.appendChild(card);
+            }
+            
+            carousel.appendChild(fragment);
+            currentIndex = endIndex;
+
+            if (currentIndex < gamesData.length) {
+                requestAnimationFrame(renderChunk);
+            }
+        }
+
+        renderChunk();
+    }
+
+	function showVods(gameIndex) {
+        const game = window.currentGamesData[gameIndex];
+        const title = document.getElementById('selectedGameTitle');
+        const buttonsDiv = document.getElementById('vodButtons');
+        
+        // Обновляем и показываем заголовок
+        title.textContent = `Записи: ${game.title}`;
+        title.classList.add('visible'); 
+        
+        buttonsDiv.innerHTML = ''; 
+
+        let hasLinks = false;
+        
+        const platforms = [
+            { key: 'youtube', text: 'Смотреть YouTube', icon: 'images/YouTube_icon_2017.svg' },
+            { key: 'vk', text: 'Смотреть VK Live', icon: 'images/VK_Video.svg' },
+            { key: 'rutube', text: 'Смотреть Rutube', icon: 'images/Rutube_icon.svg' }
+        ];
+
+        platforms.forEach(platform => {
+            if (game[platform.key] && game[platform.key].trim() !== '') {
+                hasLinks = true;
+                const btn = document.createElement('a');
+                btn.href = game[platform.key];
+                btn.className = 'action-btn';
+                btn.target = '_blank';
+                
+                btn.innerHTML = `
+                    <div class="btn-icon" style="background-image: url('${platform.icon}');"></div>
+                    <span>${platform.text}</span>
+                `;
+                
+                buttonsDiv.appendChild(btn);
+            }
+        });
+
+        // Если ссылок у игры нет — выводим сообщение, вместо пустоты
+        if (!hasLinks) {
+            buttonsDiv.innerHTML = '<p class="placeholder-text">Записи временно отсутствуют</p>';
+        }
+
+        // Больше не используем добавление класса .active, так как блок всегда виден,
+        // но плавно скроллим к нему
+        const container = document.getElementById('vodContainer');
+        container.scrollIntoView({behavior: "smooth", block: "center"});
+    }
+
+    document.getElementById('gameSearch').addEventListener('input', function(e) {
+        const term = e.target.value.toLowerCase();
+        const cards = document.querySelectorAll('.game-card');
+        cards.forEach(card => {
+            const title = card.getAttribute('data-title').toLowerCase();
+            card.style.display = title.includes(term) ? 'block' : 'none';
+        });
+    });
+
+    const days = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС'];
+    const scheduleTimes = ['21:00 - 23:30', '21:00 - 23:30', '21:00 - 23:30', '21:00 - 23:30', '21:00 - 23:30', '11:00 - 23:30', '11:00 - 23:30'];
+    
+    // Массив с путями к вашим иконкам для каждого дня недели
+    // Сохраните нужные svg в папку images
+    const dayIcons = [
+        'images/gamepad.svg', // Понедельник
+        'images/gamepad.svg', // Вторник
+        'images/gamepad.svg',    // Среда 
+        'images/gamepad.svg', // Четверг
+        'images/gamepad.svg', // Пятница
+        'images/gamepad.svg', // Суббота
+        'images/gamepad.svg'     // Воскресенье 
+    ];
+    
+    const grid = document.getElementById('scheduleGrid');
+    const currentDayIndex = (new Date().getDay() + 6) % 7; 
+
+    days.forEach((day, index) => {
+        const card = document.createElement('div');
+        card.className = 'day-card';
+        if (index === currentDayIndex) card.classList.add('today');
+        
+        card.innerHTML = `
+            <div class="day-icon" style="background-image: url('${dayIcons[index]}');"></div>
+            <div class="day-name">${day}</div>
+            <div class="time">${scheduleTimes[index]}</div>
+        `;
+        grid.appendChild(card);
+    });
+
+	const scrollBtn = document.getElementById('scrollTop');
+    window.addEventListener('scroll', () => {
+        // 1. Вычисляем процент прокрутки страницы
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrollProgress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+        
+        // 2. Передаем процент в CSS для заливки кнопки
+        scrollBtn.style.setProperty('--scroll-progress', `${scrollProgress}%`);
+
+        // 3. Плавное появление кнопки (после 300px прокрутки вниз)
+        if (scrollTop > 300) {
+            scrollBtn.classList.add('visible');
+        } else {
+            scrollBtn.classList.remove('visible');
+        }
+    });
+
+	// Установка текущего года в футер
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+    initGames();
+
+	// Функция копирования номера карты
+    function copyCardNumber(textToCopy, element) {
+        // Записываем текст в буфер обмена
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            // Сохраняем изначальный текст (номер карты), чтобы потом вернуть его
+            const originalText = element.innerText;
+            
+            // Меняем текст и добавляем класс для изменения цвета
+            element.innerText = 'Скопировано!';
+            element.classList.add('copied');
+            
+            // Возвращаем всё как было через 2 секунды (2000 миллисекунд)
+            setTimeout(() => {
+                element.innerText = originalText;
+                element.classList.remove('copied');
+            }, 2000);
+        }).catch(err => {
+            console.error('Ошибка копирования: ', err);
+            element.innerText = 'Ошибка';
+        });
+    }
+
+	// --- Логика перетаскивания карусели с инерцией и плавным прилипанием ---
+    const slider = document.getElementById('gameCarousel');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+    let velocity = 0;      
+    let momentumID;        
+    let snapTimeoutID;     // ID таймера для возврата прилипания
+    let prevX;             
+    let lastMoveTime;      
+    window.isDraggingCarousel = false;
+
+    slider.addEventListener('mousedown', (e) => {
+        isDown = true;
+        window.isDraggingCarousel = false; 
+        slider.style.cursor = 'grabbing';
+        
+        // Отменяем анимации, если мы схватили карусель в момент её движения
+        cancelAnimationFrame(momentumID);
+        clearTimeout(snapTimeoutID);
+        
+        slider.style.scrollSnapType = 'none'; 
+        // Остановка нативной плавной доводки (если она еще идет)
+        slider.scrollLeft = slider.scrollLeft; 
+        
+        startX = e.pageX - slider.offsetLeft;
+        scrollLeft = slider.scrollLeft;
+        prevX = e.pageX;
+        velocity = 0;
+    });
+
+	// Новая, точная функция плавной доводки до ближайшей карточки
+    function smoothSnap() {
+        const cards = slider.querySelectorAll('.game-card');
+        if (cards.length === 0) {
+            slider.style.scrollSnapType = 'x mandatory';
+            return;
+        }
+        
+        let targetLeft = 0;
+        let minDistance = Infinity;
+
+        // Перебираем все карточки, чтобы найти самую близкую к текущей позиции
+        cards.forEach((card, index) => {
+            // Первая карточка всегда должна прилипать к самому началу (0), чтобы сохранить красивый левый отступ (padding)
+            let cardPosition = 0;
+            
+            if (index > 0) {
+                // Для всех остальных карточек вычисляем их точную физическую позицию в пикселях
+                cardPosition = card.offsetLeft - slider.offsetLeft;
+            }
+            
+            // Проверяем, насколько далеко эта карточка от центра экрана
+            const distance = Math.abs(slider.scrollLeft - cardPosition);
+            if (distance < minDistance) {
+                minDistance = distance;
+                targetLeft = cardPosition; // Запоминаем идеальную координату
+            }
+        });
+
+        // Командуем браузеру плавно докрутить до высчитанной идеальной точки
+        slider.scrollTo({
+            left: targetLeft,
+            behavior: 'smooth'
+        });
+
+        // Функция возврата жесткого прилипания
+        let snapRestored = false;
+        const restoreSnap = () => {
+            if (snapRestored) return;
+            snapRestored = true;
+            slider.style.scrollSnapType = 'x mandatory';
+            slider.removeEventListener('scrollend', restoreSnap);
+        };
+
+        // Ждем реального завершения прокрутки (scrollend), чтобы не прервать анимацию на полуслове.
+        // И оставляем setTimeout на 550мс как подстраховку для старых браузеров.
+        slider.addEventListener('scrollend', restoreSnap);
+        snapTimeoutID = setTimeout(restoreSnap, 550); 
+    }
+
+    function beginMomentum() {
+        if (Date.now() - lastMoveTime > 100) {
+            velocity = 0;
+        }
+
+        if (Math.abs(velocity) > 0.5) {
+            momentumID = requestAnimationFrame(momentumLoop);
+        } else {
+            smoothSnap(); // Если скорости нет, плавно доводим карточку
+        }
+    }
+
+    function momentumLoop() {
+        slider.scrollLeft += velocity;
+        velocity *= 0.92; // Затухание
+        
+        if (Math.abs(velocity) > 0.5) {
+            momentumID = requestAnimationFrame(momentumLoop);
+        } else {
+            smoothSnap(); // Когда инерция иссякла, плавно доводим карточку
+        }
+    }
+
+    slider.addEventListener('mouseleave', () => {
+        if (!isDown) return;
+        isDown = false;
+        slider.style.cursor = 'grab';
+        beginMomentum();
+    });
+
+    slider.addEventListener('mouseup', () => {
+        if (!isDown) return;
+        isDown = false;
+        slider.style.cursor = 'grab';
+        beginMomentum();
+    });
+
+    slider.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        
+        const x = e.pageX - slider.offsetLeft;
+        const walk = (x - startX) * 1.5; 
+        
+        if (Math.abs(walk) > 5) {
+            window.isDraggingCarousel = true; 
+        }
+        
+        slider.scrollLeft = scrollLeft - walk;
+        
+        velocity = (prevX - e.pageX) * 1.5;
+        prevX = e.pageX;
+        lastMoveTime = Date.now();
+    });
+
+</script>
+</body>
+</html>
