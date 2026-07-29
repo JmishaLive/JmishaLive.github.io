@@ -531,6 +531,65 @@
             position: relative;
             z-index: 2; 
         }
+
+/* --- МОБИЛЬНАЯ АДАПТАЦИЯ (Ширина экрана до 768px) --- */
+@media (max-width: 768px) {
+    
+    /* 1. Оптимизация шапки */
+    .header-inner {
+        flex-wrap: wrap; 
+    }
+    
+    .socials {
+        width: 100%; 
+        margin-top: 15px; 
+        justify-content: space-between; 
+        gap: 10px; 
+    }
+
+    /* Делаем кнопки резиновыми, но сохраняем их квадратными */
+    .social-btn {
+        flex: 1 1 auto; 
+        max-width: 45px; 
+        width: auto; /* Сбрасываем жесткие 40px */
+        height: auto; /* Сбрасываем жесткие 40px */
+        aspect-ratio: 1 / 1; 
+    }
+
+    /* Слегка уменьшаем текст в шапке, чтобы он не упирался в края */
+    .brand-text .nickname {
+        font-size: 1.8rem; 
+    }
+    
+    .brand-text .quote {
+        font-size: 0.7rem; 
+    }
+
+    /* 2. Оптимизация карусели */
+    .carousel {
+        gap: 15px; /* Уменьшаем расстояние между карточками (было 25px) */
+    }
+
+    .game-card {
+        width: 28vw; /* Карточка занимает 28% экрана (3 шт = 84%, плюс виден край четвертой) */
+        min-width: 105px; /* Защита от слишком сильного сжатия */
+    }
+
+    .game-card img {
+        height: auto; /* Сбрасываем жесткие 213px */
+        aspect-ratio: 3 / 4; /* Поддерживаем правильные пропорции постеров */
+    }
+
+    .game-title {
+        font-size: 12px; 
+        padding: 8px 4px; 
+    }
+    
+    /* Делаем иконки поддержки чуть компактнее на мобильных */
+    .support-grid {
+        grid-template-columns: 1fr; /* Карточки поддержки выстроятся в один столбец */
+    }
+}
     </style>
 </head>
 <body>
