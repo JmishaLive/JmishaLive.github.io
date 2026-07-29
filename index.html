@@ -3,6 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Добавляем запрет на превращение цифр в синие ссылки -->
+    <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+    
+<!-- Базовые настройки для поисковиков (Яндекс, Google) -->
+<meta name="description" content="Jmisha Стример. Записи трансляций на YouTube, VK Video, Rutube. Расписание, ссылки и контакты!">
+<meta name="keywords" content="jmisha, стримы, записи трансляций, игры, прохождения, youtube, vk video, rutube, twitch">
+<meta name="author" content="Jmisha">
+
+<!-- Open Graph (для красивых ссылок-превью в VK, Telegram, Discord) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Jmisha Стример">
+<meta property="og:description" content="Записи трансляций на YouTube, VK Video, Rutube. Расписание, ссылки и контакты!">
+<meta property="og:url" content="https://jmisha.ru/">
+<meta property="og:image" content="https://jmisha.ru/images/preview.jpg">
+<meta property="og:site_name" content="Jmisha Streamer">
+
+<!-- Теги специально для правильного отображения в Twitter / X (Telegram тоже их иногда использует) -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Jmisha Стример">
+<meta name="twitter:description" content="Архив трансляций на YouTube, VK Video и Rutube. Расписание, ссылки и контакты!">
+<meta name="twitter:image" content="https://jmisha.ru/images/preview.jpg">
+
     <title>Jmisha Streamer</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <style>
@@ -388,6 +410,13 @@
             transition: all 0.3s;
             user-select: none; /* Запрещаем обычное выделение текста мышкой */
         }
+
+	/* Принудительно заставляем любые авто-ссылки внутри карточки наследовать наш белый цвет */
+	.copy-card a {
+    		color: var(--text-color) !important;
+    		text-decoration: none !important;
+    		pointer-events: none; /* Запрещаем браузеру пытаться "позвонить" по этому номеру */
+	}
 
         .copy-card:hover {
             background: rgba(255, 255, 255, 0.1);
