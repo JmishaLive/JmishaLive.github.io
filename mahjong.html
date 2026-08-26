@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merge Mahjong - Анимации и Цвета</title>
+    <title>Merge Mahjong - Модульные Темы</title>
     <style>
         :root {
             --tile-width: 60px;
@@ -22,7 +22,16 @@
             overflow: hidden; 
         }
 
-        .header { display: flex; gap: 20px; margin-bottom: 20px; }
+        .header { display: flex; gap: 15px; margin-bottom: 20px; align-items: center; }
+
+        select {
+            padding: 10px 15px; font-size: 16px; font-weight: bold;
+            cursor: pointer; border: none; border-radius: 8px;
+            background-color: #ecf0f1; color: #333;
+            box-shadow: 0 4px 0 #bdc3c7; outline: none;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+        select:active { transform: translateY(4px); box-shadow: 0 0 0 #bdc3c7; }
 
         button {
             padding: 10px 20px; font-size: 16px; font-weight: bold;
@@ -31,122 +40,121 @@
             box-shadow: 0 4px 0 #d4ac0d;
             transition: transform 0.1s, box-shadow 0.1s;
         }
-
         button:active { transform: translateY(4px); box-shadow: 0 0 0 #d4ac0d; }
 
         #game-board {
             position: relative; width: 800px; height: 600px;
             background-color: rgba(0, 0, 0, 0.2); border-radius: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 20px; overflow: hidden;
         }
 
         .tile {
-            position: absolute;
-            width: var(--tile-width); height: var(--tile-height);
+            position: absolute; width: var(--tile-width); height: var(--tile-height);
             border: 1px solid rgba(255,255,255,0.2); border-radius: 8px;
             display: flex; justify-content: center; align-items: center;
             font-size: 28px; font-weight: bold; color: white;
-            cursor: grab; user-select: none;
-            touch-action: none; 
-            
-            /* Убрали переменную, базовая яркость для всех одинаковая */
+            cursor: grab; user-select: none; touch-action: none; 
             filter: brightness(1);
-            
-            box-shadow: 
-                2px 2px 0px rgba(255,255,255,0.3),
-                4px 4px 0px rgba(0,0,0,0.2),
-                6px 6px 10px rgba(0,0,0,0.5);
+            box-shadow: 2px 2px 0px rgba(255,255,255,0.3), 4px 4px 0px rgba(0,0,0,0.2), 6px 6px 10px rgba(0,0,0,0.5);
             transition: filter 0.3s, border 0.2s, transform 0.2s;
+            background-size: cover; background-position: center;
         }
 
-        /* Заблокированные фишки делаем серыми и темными */
-        .tile.blocked {
-            filter: brightness(0.4) grayscale(0.5);
-            cursor: not-allowed;
-        }
-
+        .tile.blocked { filter: brightness(0.4) grayscale(0.5); cursor: not-allowed; }
         .tile.dragging {
-            cursor: grabbing;
-            z-index: 99999 !important; 
-            filter: brightness(1.2); /* Слегка подсвечиваем ту, что в руке */
-            transform: scale(1.15) translateY(-5px);
-            border: 3px solid #fff;
-            box-shadow: 
-                4px 4px 0px rgba(255,255,255,0.4),
-                10px 10px 25px rgba(0, 0, 0, 0.7);
+            cursor: grabbing; z-index: 99999 !important; 
+            filter: brightness(1.2); transform: scale(1.15) translateY(-5px);
+            border: 3px solid #fff; box-shadow: 4px 4px 0px rgba(255,255,255,0.4), 10px 10px 25px rgba(0, 0, 0, 0.7);
         }
+        .tile.snap-back { transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.3s !important; }
 
-        .tile.snap-back {
-            transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                        top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                        transform 0.3s !important;
-        }
+        @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes burnOut { 0% { transform: scale(1); opacity: 1; filter: brightness(1.2); } 100% { transform: scale(1.4); opacity: 0; filter: brightness(2); } }
+        @keyframes shufflePulse { 0% { transform: scale(1); } 50% { transform: scale(0.7) rotate(10deg); filter: brightness(1.5); } 100% { transform: scale(1); } }
 
-        /* --- НОВЫЕ АНИМАЦИИ СЛИЯНИЯ --- */
-        @keyframes popIn {
-            0% { transform: scale(0.3); opacity: 0; }
-            60% { transform: scale(1.15); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        }
+        .tile.pop-in { animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        .tile.burn { pointer-events: none !important; z-index: 99999 !important; animation: burnOut 0.3s ease-out forwards; }
+        .tile.shuffling { animation: shufflePulse 0.4s ease-in-out; }
 
-        @keyframes burnOut {
-            0% { transform: scale(1); opacity: 1; filter: brightness(1.2); }
-            100% { transform: scale(1.4); opacity: 0; filter: brightness(2); }
-        }
-
-        /* Класс для появляющейся новой фишки */
-        .tile.pop-in {
-            animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        /* Класс для сгорающих старых фишек */
-        .tile.burn {
-            pointer-events: none !important; /* Блокируем клики во время анимации */
-            z-index: 99999 !important; /* Чтобы вспышка была поверх стола */
-            animation: burnOut 0.3s ease-out forwards;
-        }
-        /* --------------------------------- */
-
-        .victory-screen {
+        .overlay-screen {
             display: none; position: absolute; top: 0; left: 0;
-            width: 100%; height: 100%; background: rgba(0,0,0,0.8);
+            width: 100%; height: 100%; background: rgba(0,0,0,0.85);
             justify-content: center; align-items: center; flex-direction: column;
             z-index: 5000; border-radius: 10px;
         }
-        .victory-screen h1 { color: #f1c40f; font-size: 48px; }
+        .overlay-screen h1 { font-size: 48px; margin-bottom: 20px; text-align: center; }
+        .overlay-screen .buttons { display: flex; gap: 15px; }
+
+        #victory-screen h1 { color: #f1c40f; }
+        #defeat-screen h1 { color: #e74c3c; }
 
         .floating-text {
             position: fixed; pointer-events: none; color: #fff;
             font-size: 22px; font-weight: bold; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
             z-index: 100000; animation: floatUp 1.2s ease-out forwards;
         }
-
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translate(-50%, 0) scale(1); }
-            100% { opacity: 0; transform: translate(-50%, -50px) scale(1.2); }
-        }
+        @keyframes floatUp { 0% { opacity: 1; transform: translate(-50%, 0) scale(1); } 100% { opacity: 0; transform: translate(-50%, -50px) scale(1.2); } }
     </style>
 </head>
 <body>
 
     <div class="header">
+        <!-- Выпадающий список тем теперь генерируется через JS -->
+        <select id="theme-select"></select>
+
+        <select id="difficulty-select">
+            <option value="1">1 масть (Легко)</option>
+            <option value="2">2 масти (Нормально)</option>
+            <option value="3" selected>3 масти (Сложно)</option>
+        </select>
+
         <button id="start-btn">Старт</button>
         <button id="undo-btn">Отмена</button>
     </div>
 
     <div id="game-board">
-        <div id="victory-screen" class="victory-screen">
+        <div id="victory-screen" class="overlay-screen">
             <h1>ПОБЕДА!</h1>
-            <button id="restart-btn">Заново</button>
+            <div class="buttons">
+                <button id="restart-win-btn">Играть снова</button>
+            </div>
+        </div>
+
+        <div id="defeat-screen" class="overlay-screen">
+            <h1>Нет доступных ходов</h1>
+            <div class="buttons">
+                <button id="restart-lose-btn">Заново</button>
+                <button id="shuffle-btn">Перемешать</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // ==========================================
+        // НАСТРОЙКИ ТЕМ (Легко добавлять новые папки)
+        // ==========================================
+        const THEMES_CONFIG = [
+            { id: 'colors', name: 'Тема: Классические цвета', type: 'color' },
+            { id: 'theme_01', name: 'Тема: Картинки 1', type: 'image', path: 'mahjong/theme_01' },
+            //  { id: 'theme_02', name: 'Тема: Картинки 2', type: 'image', path: 'mahjong/theme_02' }
+            // Чтобы добавить 3-ю тему, просто допишите строку ниже:
+            // { id: 'theme_03', name: 'Тема: Супер Картинки', type: 'image', path: 'mahjong/theme_03' }
+        ];
+
+        // ==========================================
+        // БАЗОВЫЕ ПЕРЕМЕННЫЕ
+        // ==========================================
         const boardElement = document.getElementById('game-board');
         const startBtn = document.getElementById('start-btn');
         const undoBtn = document.getElementById('undo-btn');
-        const restartBtn = document.getElementById('restart-btn');
+        const difficultySelect = document.getElementById('difficulty-select');
+        const themeSelect = document.getElementById('theme-select');
+        
         const victoryScreen = document.getElementById('victory-screen');
+        const defeatScreen = document.getElementById('defeat-screen');
+        const restartWinBtn = document.getElementById('restart-win-btn');
+        const restartLoseBtn = document.getElementById('restart-lose-btn');
+        const shuffleBtn = document.getElementById('shuffle-btn');
 
         const TILE_WIDTH = 60;
         const TILE_HEIGHT = 80;
@@ -155,28 +163,31 @@
         let history = []; 
         let idCounter = 0; 
 
-        const SUIT_COLORS = {
-            blue: '#2980b9',   
-            green: '#27ae60',  
-            yellow: '#d35400'  
-        };
+        const SUIT_COLORS = { blue: '#2980b9', green: '#27ae60', yellow: '#d35400' };
 
+        // Инициализация выпадающего списка тем
+        THEMES_CONFIG.forEach(theme => {
+            const option = document.createElement('option');
+            option.value = theme.id;
+            option.innerText = theme.name;
+            themeSelect.appendChild(option);
+        });
+
+        // ==========================================
+        // КЛАСС ФИШКИ
+        // ==========================================
         class Tile {
             constructor(id, x, y, z, value, suit) {
-                this.id = id;
-                this.x = x;
-                this.y = y;
-                this.z = z;
-                this.value = value;
-                this.suit = suit; 
+                this.id = id; this.x = x; this.y = y; this.z = z;
+                this.value = value; this.suit = suit; 
                 
                 this.element = document.createElement('div');
                 this.element.className = 'tile';
                 this.element.innerText = this.value;
-                this.element.style.backgroundColor = SUIT_COLORS[this.suit];
                 
-                const normX = this.x + 10; 
-                const normY = this.y + 10;
+                this.applyTheme();
+                
+                const normX = this.x + 10; const normY = this.y + 10;
                 this.element.style.zIndex = Math.floor((this.z * 1000) + (normY * 100) + normX);
                 
                 const offsetX = 400 - (TILE_WIDTH / 2);
@@ -188,7 +199,6 @@
                 
                 this.element.style.left = `${this.pxLeft}px`;
                 this.element.style.top = `${this.pxTop}px`;
-
                 this.element.tileInstance = this;
 
                 this.isDragging = false;
@@ -198,18 +208,33 @@
                 this.element.addEventListener('pointercancel', (e) => this.snapBackAndCancel(e));
             }
 
+            // Умное применение темы из конфига
+            applyTheme() {
+                const currentThemeId = themeSelect.value;
+                // Находим настройки выбранной темы в массиве THEMES_CONFIG
+                const themeData = THEMES_CONFIG.find(t => t.id === currentThemeId);
+                
+                if (themeData.type === 'image') {
+                    // Используем путь из настроек (напр. 'mahjong/theme_01/blue_8.png')
+                    this.element.style.backgroundImage = `url('${themeData.path}/${this.suit}_${this.value}.png')`;
+                    this.element.style.color = 'transparent'; 
+                    this.element.style.backgroundColor = 'transparent';
+                } else {
+                    this.element.style.backgroundImage = 'none';
+                    this.element.style.backgroundColor = SUIT_COLORS[this.suit];
+                    this.element.style.color = 'white'; 
+                }
+            }
+
             startDrag(e) {
                 if (!isTileFree(this)) {
-                    showFloatingText("Нельзя взять", e.clientX, e.clientY);
+                    showFloatingText("Заблокировано", e.clientX, e.clientY);
                     return;
                 }
-                
                 e.preventDefault();
                 this.isDragging = true;
-                
                 this.element.setPointerCapture(e.pointerId);
                 this.element.classList.add('dragging');
-
                 const rect = this.element.getBoundingClientRect();
                 this.dragOffsetX = e.clientX - rect.left;
                 this.dragOffsetY = e.clientY - rect.top;
@@ -217,22 +242,19 @@
 
             drag(e) {
                 if (!this.isDragging) return;
-
                 const boardRect = boardElement.getBoundingClientRect();
                 const newLeft = (e.clientX - boardRect.left) - this.dragOffsetX;
                 const newTop = (e.clientY - boardRect.top) - this.dragOffsetY;
-
                 this.element.style.left = `${newLeft}px`;
                 this.element.style.top = `${newTop}px`;
             }
 
             stopDrag(e) {
                 if (!this.isDragging) return;
-                
                 this.isDragging = false;
                 this.element.releasePointerCapture(e.pointerId);
                 this.element.classList.remove('dragging');
-
+                
                 this.element.style.pointerEvents = 'none';
                 const elemBelow = document.elementFromPoint(e.clientX, e.clientY);
                 this.element.style.pointerEvents = 'auto'; 
@@ -250,7 +272,6 @@
                         showFloatingText("Не подходит", e.clientX, e.clientY, "#fff");
                     }
                 }
-
                 this.snapBack();
             }
 
@@ -266,20 +287,18 @@
                 this.element.classList.add('snap-back');
                 this.element.style.left = `${this.pxLeft}px`;
                 this.element.style.top = `${this.pxTop}px`;
-                
-                setTimeout(() => {
-                    this.element.classList.remove('snap-back');
-                }, 300);
+                setTimeout(() => this.element.classList.remove('snap-back'), 300);
             }
         }
 
+        // ==========================================
+        // ЛОГИКА ИГРЫ
+        // ==========================================
         function showFloatingText(message, x, y, color = "#e74c3c") {
             const textEl = document.createElement('div');
             textEl.className = 'floating-text';
             textEl.innerText = message;
-            textEl.style.left = `${x}px`;
-            textEl.style.top = `${y}px`;
-            textEl.style.color = color;
+            textEl.style.left = `${x}px`; textEl.style.top = `${y}px`; textEl.style.color = color;
             document.body.appendChild(textEl);
             setTimeout(() => textEl.remove(), 1200);
         }
@@ -287,10 +306,8 @@
         function isTileFree(targetTile) {
             const isCovered = tiles.some(t => t.z === targetTile.z + 1 && t.x === targetTile.x && t.y === targetTile.y);
             if (isCovered) return false;
-
             const hasLeftNeighbor = tiles.some(t => t.z === targetTile.z && t.y === targetTile.y && t.x === targetTile.x - 1);
             const hasRightNeighbor = tiles.some(t => t.z === targetTile.z && t.y === targetTile.y && t.x === targetTile.x + 1);
-
             return !(hasLeftNeighbor && hasRightNeighbor);
         }
 
@@ -309,22 +326,31 @@
             history.push(state);
         }
 
-        // --- ИЗМЕНЕННАЯ ФУНКЦИЯ MERGE С АНИМАЦИЯМИ ---
+        function hasAvailableMoves() {
+            if (tiles.length === 0) return true; 
+
+            const freeTiles = tiles.filter(t => isTileFree(t));
+
+            for (let i = 0; i < freeTiles.length; i++) {
+                for (let j = i + 1; j < freeTiles.length; j++) {
+                    if (freeTiles[i].value === freeTiles[j].value && freeTiles[i].suit === freeTiles[j].suit) {
+                        return true; 
+                    }
+                }
+            }
+            return false; 
+        }
+
         function mergeTiles(draggedTile, targetTile, event) {
             saveState(); 
 
-            // Логически сразу удаляем фишки из массива игры, чтобы они освободили место
             tiles = tiles.filter(t => t.id !== draggedTile.id && t.id !== targetTile.id);
-            
-            // Визуально привязываем перетаскиваемую фишку прямо поверх целевой
             draggedTile.element.style.left = `${targetTile.pxLeft}px`;
             draggedTile.element.style.top = `${targetTile.pxTop}px`;
             
-            // Добавляем класс анимации сгорания
             draggedTile.element.classList.add('burn');
             targetTile.element.classList.add('burn');
 
-            // Удаляем старые DOM элементы после того, как завершится анимация .burn (300мс)
             setTimeout(() => {
                 draggedTile.element.remove();
                 targetTile.element.remove();
@@ -334,12 +360,9 @@
                 showFloatingText("🔥 Сгорели!", event.clientX, event.clientY, "#f1c40f");
             } else {
                 const newValue = draggedTile.value * 2; 
-                // Создаем новую фишку на этом же месте
                 const newTile = new Tile(idCounter++, targetTile.x, targetTile.y, targetTile.z, newValue, draggedTile.suit);
                 
-                // Добавляем красивую анимацию появления
                 newTile.element.classList.add('pop-in');
-                // Убираем класс после анимации, чтобы он не конфликтовал с перетаскиванием
                 setTimeout(() => newTile.element.classList.remove('pop-in'), 300);
 
                 tiles.push(newTile);
@@ -347,13 +370,44 @@
             }
             
             updateBoardVisuals();
-            checkVictory(); 
-        }
-
-        function checkVictory() {
+            
             if (tiles.length === 0) {
                 victoryScreen.style.display = 'flex';
+            } else if (!hasAvailableMoves()) {
+                defeatScreen.style.display = 'flex';
             }
+        }
+
+        function shuffleBoard() {
+            saveState(); 
+
+            const getExposure = (x, y, z) => (z * 100) + Math.abs(x + 0.5) + Math.abs(y + 0.5);
+            
+            let tilesByExposure = [...tiles].sort((a, b) => {
+                return getExposure(b.x, b.y, b.z) - getExposure(a.x, a.y, a.z);
+            });
+
+            let remainingData = tiles.map(t => ({ value: t.value, suit: t.suit }));
+            remainingData.sort((a, b) => {
+                if (a.value !== b.value) return a.value - b.value;
+                if (a.suit < b.suit) return -1;
+                if (a.suit > b.suit) return 1;
+                return 0;
+            });
+
+            tilesByExposure.forEach((t, index) => {
+                t.value = remainingData[index].value;
+                t.suit = remainingData[index].suit;
+                
+                t.element.innerText = t.value;
+                t.applyTheme();
+
+                t.element.classList.add('shuffling');
+                setTimeout(() => t.element.classList.remove('shuffling'), 400);
+            });
+
+            defeatScreen.style.display = 'none'; 
+            updateBoardVisuals(); 
         }
 
         function undoMove() {
@@ -364,6 +418,7 @@
             document.querySelectorAll('.tile').forEach(el => el.remove());
             tiles = [];
             victoryScreen.style.display = 'none'; 
+            defeatScreen.style.display = 'none'; 
 
             lastState.forEach(data => {
                 const t = new Tile(data.id, data.x, data.y, data.z, data.value, data.suit);
@@ -380,29 +435,33 @@
         function generateLevel() {
             idCounter = 0;
             let positions = [];
+            const suitsCount = parseInt(difficultySelect.value); 
 
             const getExposure = (x, y, z) => (z * 100) + Math.abs(x + 0.5) + Math.abs(y + 0.5);
 
-            for(let x = -4; x <= 3; x++) {
-                for(let y = -3; y <= 2; y++) positions.push({x, y, z: 0, exp: getExposure(x, y, 0)});
-            }
-            for(let x = -2; x <= 1; x++) {
-                for(let y = -1; y <= 1; y++) positions.push({x, y, z: 1, exp: getExposure(x, y, 1)});
-            }
-            for(let x = -1; x <= 0; x++) {
-                for(let y = -1; y <= 0; y++) positions.push({x, y, z: 2, exp: getExposure(x, y, 2)});
-            }
+            for(let x = -4; x <= 3; x++) { for(let y = -3; y <= 2; y++) positions.push({x, y, z: 0, exp: getExposure(x, y, 0)}); }
+            for(let x = -2; x <= 1; x++) { for(let y = -1; y <= 1; y++) positions.push({x, y, z: 1, exp: getExposure(x, y, 1)}); }
+            for(let x = -1; x <= 0; x++) { for(let y = -1; y <= 0; y++) positions.push({x, y, z: 2, exp: getExposure(x, y, 2)}); }
 
-            let tilePool = [
-                ...Array(6).fill({ value: 8, suit: 'blue' }),
-                ...Array(6).fill({ value: 8, suit: 'green' }),
-                ...Array(4).fill({ value: 8, suit: 'yellow' })
-            ];
+            let tilePool = [];
+            if (suitsCount === 1) {
+                tilePool = Array(16).fill({ value: 8, suit: 'blue' });
+            } else if (suitsCount === 2) {
+                tilePool = [
+                    ...Array(8).fill({ value: 8, suit: 'blue' }),
+                    ...Array(8).fill({ value: 8, suit: 'green' })
+                ];
+            } else {
+                tilePool = [
+                    ...Array(6).fill({ value: 8, suit: 'blue' }),
+                    ...Array(6).fill({ value: 8, suit: 'green' }),
+                    ...Array(4).fill({ value: 8, suit: 'yellow' })
+                ];
+            }
 
             while (tilePool.length < 64) {
                 let splittable = tilePool.map((t, i) => t.value > 1 ? i : -1).filter(i => i !== -1);
                 if (splittable.length === 0) break; 
-
                 let randIdx = splittable[Math.floor(Math.random() * splittable.length)];
                 
                 let target = tilePool[randIdx];
@@ -422,21 +481,33 @@
             });
 
             updateBoardVisuals();
+            
+            if (!hasAvailableMoves()) {
+                shuffleBoard();
+            }
         }
 
         function startGame() {
             document.querySelectorAll('.tile').forEach(el => el.remove());
             victoryScreen.style.display = 'none';
+            defeatScreen.style.display = 'none';
             tiles = [];
             history = [];
-
             generateLevel(); 
         }
 
-        startBtn.addEventListener('click', startGame);
-        restartBtn.addEventListener('click', startGame);
-        undoBtn.addEventListener('click', undoMove);
+        // --- ОБНОВЛЕНИЕ ТЕМЫ В РЕАЛЬНОМ ВРЕМЕНИ ---
+        themeSelect.addEventListener('change', () => {
+            tiles.forEach(tile => tile.applyTheme());
+        });
 
+        startBtn.addEventListener('click', startGame);
+        undoBtn.addEventListener('click', undoMove);
+        restartWinBtn.addEventListener('click', startGame);
+        restartLoseBtn.addEventListener('click', startGame);
+        shuffleBtn.addEventListener('click', shuffleBoard);
+
+        // Старт!
         startGame();
     </script>
 </body>
