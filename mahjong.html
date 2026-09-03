@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Merge Mahjong - Формы стола</title>
+    <title>Merge Mahjong - Процедурные уровни</title>
     <style>
         :root {
             --tile-width: 60px;
@@ -18,44 +18,59 @@
             flex-direction: column;
             align-items: center;
             margin: 0;
-            padding: 20px;
+            padding: 15px;
             overflow: hidden; 
         }
 
-        /* Обновили шапку, чтобы селекты переносились на узких экранах */
         .header { 
             display: flex; 
             flex-wrap: wrap; 
             justify-content: center;
-            gap: 15px; 
-            margin-bottom: 20px; 
+            gap: 10px; 
+            margin-bottom: 15px; 
             align-items: center; 
+            background: rgba(0,0,0,0.25);
+            padding: 10px 20px;
+            border-radius: 12px;
         }
 
-        select, button {
-            padding: 10px 15px; font-size: 16px; font-weight: bold;
+        .input-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        select, input[type="number"], button {
+            padding: 8px 12px; font-size: 15px; font-weight: bold;
             cursor: pointer; border: none; border-radius: 8px;
             color: #333; outline: none;
             transition: transform 0.1s, box-shadow 0.1s;
         }
         
-        select { background-color: #ecf0f1; box-shadow: 0 4px 0 #bdc3c7; }
-        select:active { transform: translateY(4px); box-shadow: 0 0 0 #bdc3c7; }
+        select, input[type="number"] { 
+            background-color: #ecf0f1; 
+            box-shadow: 0 3px 0 #bdc3c7; 
+        }
+        input[type="number"] { width: 65px; cursor: text; }
 
-        button { background-color: #f1c40f; box-shadow: 0 4px 0 #d4ac0d; }
-        button:active { transform: translateY(4px); box-shadow: 0 0 0 #d4ac0d; }
+        button { 
+            background-color: #f1c40f; 
+            box-shadow: 0 4px 0 #d4ac0d; 
+        }
+        button:active { transform: translateY(3px); box-shadow: 0 0 0 #d4ac0d; }
 
         #shuffle-btn.destroy-mode {
             background-color: #e74c3c;
             color: white;
             box-shadow: 0 4px 0 #c0392b;
         }
-        #shuffle-btn.destroy-mode:active { box-shadow: 0 0 0 #c0392b; }
 
         #game-board {
-            position: relative; width: 800px; height: 600px;
+            position: relative; width: 820px; height: 620px;
             background-color: rgba(0, 0, 0, 0.2); border-radius: 10px;
-            margin-bottom: 20px; overflow: hidden;
+            margin-bottom: 10px; overflow: hidden;
         }
 
         .tile {
@@ -70,13 +85,17 @@
             background-size: cover; background-position: center;
         }
 
-        .tile.blocked { filter: brightness(0.4) grayscale(0.5); cursor: not-allowed; }
+        .tile.blocked { filter: brightness(0.35) grayscale(0.6); cursor: not-allowed; }
         .tile.dragging {
             cursor: grabbing; z-index: 99999 !important; 
             filter: brightness(1.2); transform: scale(1.15) translateY(-5px);
             border: 3px solid #fff; box-shadow: 4px 4px 0px rgba(255,255,255,0.4), 10px 10px 25px rgba(0, 0, 0, 0.7);
         }
-        .tile.snap-back { transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), transform 0.3s !important; }
+        .tile.snap-back { 
+            transition: left 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        top 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                        transform 0.3s !important; 
+        }
 
         @keyframes popIn { 0% { transform: scale(0.3); opacity: 0; } 60% { transform: scale(1.15); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
         @keyframes burnOut { 0% { transform: scale(1); opacity: 1; filter: brightness(1.2); } 100% { transform: scale(1.4); opacity: 0; filter: brightness(2); } }
@@ -92,7 +111,7 @@
             justify-content: center; align-items: center; flex-direction: column;
             z-index: 5000; border-radius: 10px;
         }
-        .overlay-screen h1 { font-size: 48px; margin-bottom: 20px; text-align: center; }
+        .overlay-screen h1 { font-size: 44px; margin-bottom: 20px; text-align: center; }
         .overlay-screen .buttons { display: flex; gap: 15px; }
 
         #victory-screen h1 { color: #f1c40f; }
@@ -110,21 +129,37 @@
 
     <div class="header">
         <select id="theme-select"></select>
-        
-        <!-- НОВОЕ: Настройка формы поля -->
-        <select id="layout-select">
-            <option value="square" selected>Расклад: Квадрат</option>
-            <option value="circle">Расклад: Круг</option>
-            <option value="star">Расклад: Звезда</option>
-            <option value="triangle">Расклад: Треугольник</option>
-            <option value="random">Расклад: Случайный</option>
+
+        <div class="input-group">
+            <label for="tile-count-input">Фишек:</label>
+            <input type="number" id="tile-count-input" value="64" min="20" max="110" step="2">
+        </div>
+
+        <div class="input-group">
+            <label for="layers-select">Слоев:</label>
+            <select id="layers-select">
+                <option value="2">2 слоя</option>
+                <option value="3" selected>3 слоя</option>
+                <option value="4">4 слоя</option>
+                <option value="5">5 слоев</option>
+            </select>
+        </div>
+
+        <select id="archetype-select">
+            <option value="random" selected>Форма: Случайная</option>
+            <option value="diamond">Форма: Ромб/Кристалл</option>
+            <option value="pagoda">Форма: Пагода</option>
+            <option value="cross">Форма: Решетка (#)</option>
+            <option value="horns">Форма: Рога/Крылья</option>
+            <option value="fortress">Форма: Крепость</option>
         </select>
 
         <select id="difficulty-select">
-            <option value="1">1 масть (Легко)</option>
-            <option value="2">2 масти (Нормально)</option>
-            <option value="3" selected>3 масти (Сложно)</option>
+            <option value="1">1 масть</option>
+            <option value="2">2 масти</option>
+            <option value="3" selected>3 масти</option>
         </select>
+
         <button id="start-btn">Старт</button>
         <button id="undo-btn">Отмена</button>
     </div>
@@ -148,17 +183,19 @@
 
     <script>
         const THEMES_CONFIG = [
-            { id: 'colors', name: 'Тема: Классические цвета', type: 'color' },
-            { id: 'theme_01', name: 'Тема: Картинки 1', type: 'image', path: 'mahjong/theme_01' },
-            { id: 'theme_02', name: 'Тема: Картинки 2', type: 'image', path: 'mahjong/theme_02' }
+            { id: 'colors', name: 'Цвета', type: 'color' },
+            { id: 'theme_01', name: 'Картинки 1', type: 'image', path: 'mahjong/theme_01' },
+            { id: 'theme_02', name: 'Картинки 2', type: 'image', path: 'mahjong/theme_02' }
         ];
 
         const boardElement = document.getElementById('game-board');
         const startBtn = document.getElementById('start-btn');
         const undoBtn = document.getElementById('undo-btn');
+        const tileCountInput = document.getElementById('tile-count-input');
+        const layersSelect = document.getElementById('layers-select');
+        const archetypeSelect = document.getElementById('archetype-select');
         const difficultySelect = document.getElementById('difficulty-select');
         const themeSelect = document.getElementById('theme-select');
-        const layoutSelect = document.getElementById('layout-select'); // Новый селект
         
         const victoryScreen = document.getElementById('victory-screen');
         const defeatScreen = document.getElementById('defeat-screen');
@@ -193,11 +230,12 @@
                 
                 this.applyTheme();
                 
-                const normX = this.x + 10; const normY = this.y + 10;
+                const normX = Math.round(this.x + 10); 
+                const normY = Math.round(this.y + 10);
                 this.element.style.zIndex = Math.floor((this.z * 1000) + (normY * 100) + normX);
                 
-                const offsetX = 400 - (TILE_WIDTH / 2);
-                const offsetY = 300 - (TILE_HEIGHT / 2);
+                const offsetX = 410 - (TILE_WIDTH / 2);
+                const offsetY = 310 - (TILE_HEIGHT / 2);
                 const zShift = this.z * 6; 
                 
                 this.pxLeft = offsetX + (this.x * TILE_WIDTH) - zShift;
@@ -218,7 +256,7 @@
                 const currentThemeId = themeSelect.value;
                 const themeData = THEMES_CONFIG.find(t => t.id === currentThemeId);
                 
-                if (themeData.type === 'image') {
+                if (themeData && themeData.type === 'image') {
                     this.element.style.backgroundImage = `url('${themeData.path}/${this.suit}_${this.value}.png')`;
                     this.element.style.color = 'transparent'; 
                     this.element.style.backgroundColor = 'transparent';
@@ -393,7 +431,7 @@
         function shuffleBoard() {
             saveState(); 
 
-            const getExposure = (x, y, z) => (z * 100) + Math.abs(x + 0.5) + Math.abs(y + 0.5);
+            const getExposure = (x, y, z) => (z * 100) + Math.abs(x) + Math.abs(y);
             
             let positionsInfo = tiles.map(t => ({
                 tile: t,
@@ -479,100 +517,201 @@
             updateBoardVisuals();
         }
 
-        // --- ОБНОВЛЕНО: Генерация позиций на основе выбранной формы ---
+        // =========================================================================
+        // ПОДЗАДАЧА 1: УНИВЕРСАЛЬНЫЙ МАТЕМАТИЧЕСКИЙ ПУЛ ДЛЯ ЛЮБОГО N
+        // =========================================================================
+        function generateTilePool(targetCount, suitsCount) {
+            // Распределяем фишки по мастям
+            let suitAllocations = Array(suitsCount).fill(Math.floor(targetCount / suitsCount));
+            for (let i = 0; i < targetCount % suitsCount; i++) suitAllocations[i]++;
+
+            const suitNames = ['blue', 'green', 'yellow'];
+            let fullPool = [];
+
+            suitAllocations.forEach((count, suitIdx) => {
+                const suit = suitNames[suitIdx];
+                // Минимум 1 пара 8-ок (2 фишки), максимум count/2 пар 8-ок
+                let pairsOfEight = Math.max(1, Math.min(Math.floor(count / 2), Math.round(count / 8)));
+                
+                // Стартуем с четного числа восьмерок
+                let pool = Array(pairsOfEight * 2).fill(8);
+
+                // Делаем ровно столько делений, чтобы длина пула стала count
+                while (pool.length < count) {
+                    let splittable = pool.map((v, i) => v > 1 ? i : -1).filter(i => i !== -1);
+                    if (splittable.length === 0) break; 
+                    
+                    let randIdx = splittable[Math.floor(Math.random() * splittable.length)];
+                    let val = pool[randIdx];
+                    pool.splice(randIdx, 1);
+                    pool.push(val / 2, val / 2);
+                }
+
+                pool.forEach(v => fullPool.push({ value: v, suit }));
+            });
+
+            return fullPool;
+        }
+
+        // =========================================================================
+        // ПОДЗАДАЧА 2 И 3: СИММЕТРИЧНЫЙ ПРОЦЕДУРНЫЙ ГЕНЕРАТОР ПОЗИЦИЙ
+        // =========================================================================
+        function generateProceduralLayout(targetCount, maxLayers, archetype) {
+            const hasPos = (list, x, y, z) => list.some(p => p.x === x && p.y === y && p.z === z);
+
+            let archetypes = ['diamond', 'pagoda', 'cross', 'horns', 'fortress'];
+            let selectedArch = archetype === 'random' ? archetypes[Math.floor(Math.random() * archetypes.length)] : archetype;
+
+            let positions = [];
+
+            // Вспомогательное добавление вертикально-симметричной пары
+            function addSymmetric(x, y, z) {
+                if (hasPos(positions, x, y, z)) return;
+                positions.push({ x, y, z });
+                if (x !== 0 && !hasPos(positions, -x, y, z)) {
+                    positions.push({ x: -x, y, z });
+                }
+            }
+
+            // 1. Построение слоя 0 по выбранному архитектурному скелету
+            if (selectedArch === 'diamond') { // Ромб / Кристалл (Рис. 1 и 3)
+                const widths = [2, 4, 6, 8, 8, 6, 4, 2];
+                widths.forEach((w, idx) => {
+                    let y = idx - 3.5;
+                    for (let x = 0.5; x < w / 2; x++) addSymmetric(x, y, 0);
+                });
+            } 
+            else if (selectedArch === 'pagoda') { // Пагода / Башня с крыльями (Рис. 2)
+                for (let x = 0.5; x <= 3.5; x++) { addSymmetric(x, -3.5, 0); addSymmetric(x, 3.5, 0); }
+                for (let y = -2.5; y <= 2.5; y++) {
+                    addSymmetric(0.5, y, 0); addSymmetric(1.5, y, 0);
+                }
+                addSymmetric(2.5, -0.5, 0); addSymmetric(2.5, 0.5, 0);
+                addSymmetric(3.5, 0, 0);
+            } 
+            else if (selectedArch === 'cross') { // Решетка # (Рис. 4)
+                for (let x = 0.5; x <= 2.5; x++) { addSymmetric(x, -2.5, 0); addSymmetric(x, 2.5, 0); }
+                for (let y = -2.5; y <= 2.5; y++) { addSymmetric(1.5, y, 0); }
+                addSymmetric(2.5, 0, 0); addSymmetric(3.5, 0, 0);
+            } 
+            else if (selectedArch === 'horns') { // Рога / Силуэт Быка (Рис. 5)
+                for (let y = -3.5; y <= -1.5; y++) addSymmetric(2.5, y, 0);
+                for (let x = 0.5; x <= 3.5; x++) addSymmetric(x, -0.5, 0);
+                for (let y = 0.5; y <= 2.5; y++) { addSymmetric(0.5, y, 0); addSymmetric(1.5, y, 0); }
+                addSymmetric(0.5, 3.5, 0);
+            } 
+            else { // Крепость / Замок
+                for (let x = 0.5; x <= 3.5; x++) {
+                    for (let y = -2.5; y <= 2.5; y++) {
+                        if (Math.abs(x) >= 2.5 || Math.abs(y) >= 1.5 || (Math.abs(x) <= 1.5 && Math.abs(y) <= 0.5)) {
+                            addSymmetric(x, y, 0);
+                        }
+                    }
+                }
+            }
+
+            // 2. Генерация верхних слоев с гарантированной опорой снизу
+            for (let z = 1; z < maxLayers; z++) {
+                let supportCandidates = positions.filter(p => p.z === z - 1 && p.x >= 0);
+                supportCandidates.forEach(p => {
+                    // Концентрическое сужение вверх для красивой пирамидальности
+                    if (Math.abs(p.x) <= (4 - z) && Math.abs(p.y) <= (3.5 - z * 0.7)) {
+                        if (Math.random() > 0.3) {
+                            addSymmetric(p.x, p.y, z);
+                        }
+                    }
+                });
+            }
+
+            // 3. Подгонка (Prune / Grow) строго до targetCount с сохранением симметрии и опор
+            let safety = 0;
+            while (positions.length !== targetCount && safety < 1000) {
+                safety++;
+                if (positions.length > targetCount) {
+                    // Находим непокрытые верхние фишки (листья), которые можно безопасно удалить
+                    let removable = positions.filter(p => !hasPos(positions, p.x, p.y, p.z + 1) && p.x >= 0);
+                    // Сортируем: сначала удаляем самые внешние фишки
+                    removable.sort((a, b) => (Math.abs(b.x) + Math.abs(b.y)) - (Math.abs(a.x) + Math.abs(a.y)));
+                    
+                    if (removable.length > 0) {
+                        let toRemove = removable[0];
+                        positions = positions.filter(p => !(p.y === toRemove.y && p.z === toRemove.z && (p.x === toRemove.x || p.x === -toRemove.x)));
+                    } else {
+                        break;
+                    }
+                } else {
+                    // Наращиваем фишки: либо на слой 0 рядом с соседями, либо на верхний слой поверх опоры
+                    let added = false;
+                    for (let z = 0; z < maxLayers; z++) {
+                        let validSpots = [];
+                        if (z === 0) {
+                            // Ищем свободное место рядом с существующими фишками
+                            positions.filter(p => p.z === 0 && p.x >= 0).forEach(p => {
+                                [[1, 0], [0, 1], [-1, 0], [0, -1]].forEach(([dx, dy]) => {
+                                    let nx = p.x + dx, ny = p.y + dy;
+                                    if (nx >= 0 && Math.abs(nx) <= 4 && Math.abs(ny) <= 3.5 && !hasPos(positions, nx, ny, 0)) {
+                                        validSpots.push({ x: nx, y: ny, z: 0 });
+                                    }
+                                });
+                            });
+                        } else {
+                            // Ищем место на z, под которым есть опора на z-1
+                            positions.filter(p => p.z === z - 1 && p.x >= 0).forEach(p => {
+                                if (!hasPos(positions, p.x, p.y, z)) {
+                                    validSpots.push({ x: p.x, y: p.y, z });
+                                }
+                            });
+                        }
+
+                        if (validSpots.length > 0) {
+                            let pick = validSpots[Math.floor(Math.random() * validSpots.length)];
+                            addSymmetric(pick.x, pick.y, pick.z);
+                            added = true;
+                            break;
+                        }
+                    }
+                    if (!added) break;
+                }
+            }
+
+            return positions;
+        }
+
+        // =========================================================================
+        // СБОРКА И ЗАПУСК УРОВНЯ
+        // =========================================================================
         function generateLevel() {
             idCounter = 0;
-            let positions = [];
-            const suitsCount = parseInt(difficultySelect.value); 
+            let targetCount = parseInt(tileCountInput.value) || 64;
+            // Делаем число четным для идеальной симметрии
+            if (targetCount % 2 !== 0) {
+                targetCount++;
+                tileCountInput.value = targetCount;
+            }
+
+            const maxLayers = parseInt(layersSelect.value) || 3;
+            const archetype = archetypeSelect.value;
+            const suitsCount = parseInt(difficultySelect.value);
+
+            // 1. Генерируем симметричные координаты с физической опорой
+            let positions = generateProceduralLayout(targetCount, maxLayers, archetype);
             
-            // Выбираем раскладку
-            let currentLayout = layoutSelect.value;
-            if (currentLayout === 'random') {
-                const layouts = ['square', 'circle', 'star', 'triangle'];
-                currentLayout = layouts[Math.floor(Math.random() * layouts.length)];
-            }
+            // Если сетка скорректировала размер, синхронизируем с инпутом
+            targetCount = positions.length;
+            tileCountInput.value = targetCount;
 
-            const getExposure = (x, y, z) => (z * 100) + Math.abs(x + 0.5) + Math.abs(y + 0.5);
+            // 2. Генерируем универсальный пул математических номиналов
+            let tilePool = generateTilePool(targetCount, suitsCount);
 
-            // МАТЕМАТИКА ФОРМ (каждая форма строго 64 фишки)
-            if (currentLayout === 'square') {
-                for(let x = -4; x <= 3; x++) for(let y = -3; y <= 2; y++) positions.push({x, y, z: 0, exp: getExposure(x, y, 0)}); // 48
-                for(let x = -2; x <= 1; x++) for(let y = -1; y <= 1; y++) positions.push({x, y, z: 1, exp: getExposure(x, y, 1)}); // 12
-                for(let x = -1; x <= 0; x++) for(let y = -1; y <= 0; y++) positions.push({x, y, z: 2, exp: getExposure(x, y, 2)}); // 4
-            } 
-            else if (currentLayout === 'circle') {
-                // Слой 0 (44)
-                const z0Lengths = [4, 8, 10, 10, 8, 4];
-                z0Lengths.forEach((len, i) => {
-                    let y = -3 + i; let startX = -Math.floor(len/2);
-                    for(let j=0; j<len; j++) positions.push({x: startX+j, y, z:0, exp: getExposure(startX+j, y, 0)});
-                });
-                // Слой 1 (16)
-                for(let x=-2; x<=1; x++) for(let y=-2; y<=1; y++) positions.push({x, y, z: 1, exp: getExposure(x, y, 1)});
-                // Слой 2 (4)
-                for(let x=-1; x<=0; x++) for(let y=-1; y<=0; y++) positions.push({x, y, z: 2, exp: getExposure(x, y, 2)});
-            }
-            else if (currentLayout === 'star') {
-                // Слой 0 (44)
-                const z0Lengths = [6, 6, 10, 10, 6, 6];
-                z0Lengths.forEach((len, i) => {
-                    let y = -3 + i; let startX = -Math.floor(len/2);
-                    for(let j=0; j<len; j++) positions.push({x: startX+j, y, z:0, exp: getExposure(startX+j, y, 0)});
-                });
-                // Слой 1 (16)
-                const z1Lengths = [2, 6, 6, 2];
-                z1Lengths.forEach((len, i) => {
-                    let y = -2 + i; let startX = -Math.floor(len/2);
-                    for(let j=0; j<len; j++) positions.push({x: startX+j, y, z:1, exp: getExposure(startX+j, y, 1)});
-                });
-                // Слой 2 (4)
-                for(let x=-1; x<=0; x++) for(let y=-1; y<=0; y++) positions.push({x, y, z: 2, exp: getExposure(x, y, 2)});
-            }
-            else if (currentLayout === 'triangle') {
-                // Слой 0 (42)
-                const z0Lengths = [2, 4, 6, 8, 10, 12];
-                z0Lengths.forEach((len, i) => {
-                    let y = -3 + i; let startX = -Math.floor(len/2);
-                    for(let j=0; j<len; j++) positions.push({x: startX+j, y, z:0, exp: getExposure(startX+j, y, 0)});
-                });
-                // Слой 1 (16)
-                const z1Lengths = [2, 4, 6, 4];
-                z1Lengths.forEach((len, i) => {
-                    let y = -2 + i; let startX = -Math.floor(len/2);
-                    for(let j=0; j<len; j++) positions.push({x: startX+j, y, z:1, exp: getExposure(startX+j, y, 1)});
-                });
-                // Слой 2 (6)
-                const z2Lengths = [2, 4];
-                z2Lengths.forEach((len, i) => {
-                    let y = -1 + i; let startX = -Math.floor(len/2);
-                    for(let j=0; j<len; j++) positions.push({x: startX+j, y, z:2, exp: getExposure(startX+j, y, 2)});
-                });
-            }
+            // 3. Вычисляем Exposure (открытость) для умного распределения номиналов
+            const getExposure = (x, y, z) => (z * 100) + Math.abs(x) + Math.abs(y);
+            positions.forEach(p => p.exp = getExposure(p.x, p.y, p.z));
 
-            // Пул фишек (всего 64)
-            let tilePool = [];
-            if (suitsCount === 1) {
-                tilePool = Array(16).fill({ value: 8, suit: 'blue' });
-            } else if (suitsCount === 2) {
-                tilePool = [...Array(8).fill({ value: 8, suit: 'blue' }), ...Array(8).fill({ value: 8, suit: 'green' })];
-            } else {
-                tilePool = [...Array(6).fill({ value: 8, suit: 'blue' }), ...Array(6).fill({ value: 8, suit: 'green' }), ...Array(4).fill({ value: 8, suit: 'yellow' })];
-            }
-
-            while (tilePool.length < 64) {
-                let splittable = tilePool.map((t, i) => t.value > 1 ? i : -1).filter(i => i !== -1);
-                if (splittable.length === 0) break; 
-                let randIdx = splittable[Math.floor(Math.random() * splittable.length)];
-                
-                let target = tilePool[randIdx];
-                tilePool.splice(randIdx, 1);
-                tilePool.push({ value: target.value / 2, suit: target.suit });
-                tilePool.push({ value: target.value / 2, suit: target.suit });
-            }
-
+            // Мелкие номиналы кладем на самые открытые места, крупные прячем вглубь
             positions.sort((a, b) => b.exp - a.exp);
             tilePool.sort((a, b) => a.value - b.value);
 
+            // 4. Создаем DOM-элементы на столе
             positions.forEach((pos, index) => {
                 const data = tilePool[index];
                 const tile = new Tile(idCounter++, pos.x, pos.y, pos.z, data.value, data.suit);
@@ -582,6 +721,7 @@
 
             updateBoardVisuals();
             
+            // Защита от тупика на старте
             if (!hasAvailableMoves()) {
                 shuffleBoard(); 
             }
