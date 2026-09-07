@@ -47,7 +47,7 @@
                 );
         }
 
-        /* --- 2. Фиксированная шапка (Десктоп) --- */
+        /* --- 2. Фиксированная шапка --- */
         header {
             position: fixed; top: 0; left: 0; width: 100%; z-index: 1000;
             background: rgba(12, 10, 20, 0.9); 
@@ -173,27 +173,24 @@
             100% { opacity: 0; transform: scale(1); }
         }
 
-        /* OSD текст в безопасной зоне */
+        /* OSD текст: только номер канала, без наплыва на заголовки */
         .crt-osd {
             position: absolute; 
-            top: 24px; 
-            right: 36px; 
+            top: 20px; 
+            right: 32px; 
             z-index: 22;
             font-family: 'Courier New', Courier, monospace;
             color: var(--crt-green); 
             text-shadow: 0 0 8px #00ff88, 0 0 16px rgba(0, 255, 136, 0.7);
             font-weight: 900; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: flex-end;
             opacity: 0; 
             transform: translateY(-4px);
             transition: opacity 0.3s, transform 0.3s; 
             pointer-events: none;
+            line-height: 1;
         }
         .crt-osd.visible { opacity: 1; transform: translateY(0); }
-        .osd-ch { font-size: 1.15rem; letter-spacing: 2px; }
-        .osd-label { font-size: 0.75rem; opacity: 0.95; letter-spacing: 1px; }
+        .osd-ch { font-size: 1.2rem; letter-spacing: 2px; }
 
         .channel-viewport { position: relative; width: 100%; height: 100%; overflow: hidden; }
 
@@ -692,7 +689,6 @@
 
         /* --- 6. МОБИЛЬНАЯ АДАПТАЦИЯ (ШИРИНА ДО 768px) --- */
         @media (max-width: 768px) {
-            /* 1. Шапка в два ряда с возвратом цитаты */
             .header-inner {
                 flex-wrap: wrap; 
                 padding: 10px 16px 12px;
@@ -730,7 +726,6 @@
                 border-radius: 8px;
             }
 
-            /* 2. Отступ под двухрядную шапку */
             .sticky-viewport {
                 padding-top: 135px;
                 padding-bottom: 10px;
@@ -745,12 +740,10 @@
             .channel-title { font-size: 1.05rem; }
             .channel-desc { font-size: 0.68rem; margin-top: 2px; }
 
-            /* 3. Канал 1: Устранен срез карточки сверху */
             .search-mini { margin-top: 2px; }
             #gameSearch { width: 82%; padding: 3px 10px; font-size: 0.72rem; }
             .carousel-container { margin: 4px 0; }
             
-            /* Запас 10px сверху полностью защищает рамку и свечение от обрезки */
             .carousel { 
                 gap: 8px; 
                 padding: 10px 4px 6px 4px; 
@@ -773,7 +766,6 @@
             .action-btn { padding: 3px 8px; font-size: 0.68rem; gap: 4px; }
             .btn-icon { width: 12px; height: 12px; }
 
-            /* 4. Канал 2: Расписание */
             .schedule-viewport-center { margin: 4px 0; }
             .schedule-grid-tv { gap: 6px 8px; max-width: 100%; }
             .day-card-tv { flex: 0 0 calc(25% - 8px); padding: 6px 2px; border-radius: 7px; }
@@ -781,7 +773,6 @@
             .time-tv { font-size: 0.62rem; margin-top: 2px; }
             .day-icon-tv { width: 18px; height: 18px; margin-bottom: 2px; }
 
-            /* 5. Канал 3: Обе карточки поддержки видны одновременно */
             .support-column-center { gap: 8px; margin: 4px 0; }
             .support-card-tv { 
                 display: grid;
@@ -796,14 +787,12 @@
             .support-card-tv .card-title { font-size: 0.82rem; margin-bottom: 0; text-align: left; }
             .support-btn-tv, .copy-card-tv { width: 108px; height: 32px; font-size: 0.76rem; }
 
-            /* 6. Канал 4: Контакты */
             .contacts-column-center { gap: 6px; margin: 4px 0; }
             .contact-card-tv { padding: 5px 10px; gap: 10px; max-width: 100%; border-radius: 8px; }
             .contact-icon-box { width: 32px; height: 32px; border-radius: 7px; }
             .contact-card-tv .c-desc { font-size: 0.58rem; }
             .contact-card-tv .c-val { font-size: 0.84rem; }
 
-            /* Кнопки ТВ на смартфоне */
             .tv-hw-tray { padding: 0 3px; }
             .channel-slot { gap: 3px; }
             .channel-btn { width: 34px; height: 14px; }
@@ -862,9 +851,9 @@
                         <div class="crt-vignette"></div>
                         <div class="crt-noise"></div>
                         
+                        <!-- OSD ТОЛЬКО НОМЕР КАНАЛА -->
                         <div class="crt-osd" id="crtOsd">
-                            <span class="osd-ch" id="osdCh">CH 01</span>
-                            <span class="osd-label" id="osdLabel">ЗАПИСИ</span>
+                            <span class="osd-ch" id="osdCh">CH 1</span>
                         </div>
 
                         <div class="channel-viewport">
@@ -968,9 +957,8 @@
                         </div>
                     </div>
 
-                    <!-- 5. АППАРАТНЫЙ ОТСЕК КНОПОК ТВ В CSS (CH 1 .. CH 4) -->
+                    <!-- 5. АППАРАТНЫЙ ОТСЕК КНОПОК ТВ В CSS -->
                     <div class="tv-hw-tray">
-                        <!-- Кнопка CH 1 -->
                         <div class="channel-slot active" data-channel="0">
                             <div class="slot-led-wrap">
                                 <span class="channel-led"></span>
@@ -980,7 +968,6 @@
                                 <button class="channel-btn" data-channel="0" title="Канал 1: Записи"></button>
                             </div>
                         </div>
-                        <!-- Кнопка CH 2 -->
                         <div class="channel-slot" data-channel="1">
                             <div class="slot-led-wrap">
                                 <span class="channel-led"></span>
@@ -990,7 +977,6 @@
                                 <button class="channel-btn" data-channel="1" title="Канал 2: Расписание"></button>
                             </div>
                         </div>
-                        <!-- Кнопка CH 3 -->
                         <div class="channel-slot" data-channel="2">
                             <div class="slot-led-wrap">
                                 <span class="channel-led"></span>
@@ -1000,7 +986,6 @@
                                 <button class="channel-btn" data-channel="2" title="Канал 3: Поддержка"></button>
                             </div>
                         </div>
-                        <!-- Кнопка CH 4 -->
                         <div class="channel-slot" data-channel="3">
                             <div class="slot-led-wrap">
                                 <span class="channel-led"></span>
@@ -1036,7 +1021,6 @@
             yearElem.textContent = new Date().getFullYear();
         }
 
-        const channelNames = ["ЗАПИСИ", "РАСПИСАНИЕ", "ПОДДЕРЖКА", "КОНТАКТЫ"];
         let currentChannel = 0;
         let isClickScrolling = false;
         let clickScrollTimer = null;
@@ -1045,11 +1029,10 @@
         const crtScreen = document.getElementById('crtScreen');
         const osd = document.getElementById('crtOsd');
         const osdCh = document.getElementById('osdCh');
-        const osdLabel = document.getElementById('osdLabel');
         const scrollTrack = document.getElementById('scrollTrack');
         const slider = document.getElementById('gameCarousel');
 
-        // Переключение каналов
+        // Переключение каналов: выводит строго "CH 1", "CH 2" и т.д.
         window.setChannel = function(index) {
             if (index === currentChannel) return;
             currentChannel = index;
@@ -1062,11 +1045,10 @@
             void crtScreen.offsetWidth;
             crtScreen.classList.add('glitch');
 
-            osdCh.textContent = `CH 0${index + 1}`;
-            osdLabel.textContent = channelNames[index];
+            osdCh.textContent = `CH ${index + 1}`;
             osd.classList.add('visible');
             clearTimeout(osdTimeout);
-            osdTimeout = setTimeout(() => osd.classList.remove('visible'), 2000);
+            osdTimeout = setTimeout(() => osd.classList.remove('visible'), 1600);
 
             document.querySelectorAll('.channel-pane').forEach((pane, i) => {
                 pane.classList.toggle('active', i === index);
